@@ -1,13 +1,13 @@
--- [[ ROYAL XPE - ULTIMATE OWNER VIP EDITION (IPHONE UI + DUAL AIMBOT + SELF-VIEW + DISCORD + AVATAR ESP) ]] --
+-- [[ ROYAL XPE - ULTIMATE OWNER VIP EDITION (SMART BALANCED FISHING UPDATE) ]] --
 
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
 -- ================= قائمة الأونرز المسموح لهم (بالآيدي - UserIds) =================
 local ALLOWED_OWNERS = {
-    [10787902171] = true, -- استبدل الأرقام بأيدي الأونرز الحقيقيين
+    [10787902171] = true,
     [9840589357] = true,
-    [11223344] = true,
+    [9661116375] = true,
     [44332211] = true,
     [55667788] = true,
     [99887766] = true,
@@ -30,16 +30,12 @@ local ALLOWED_OWNERS = {
 -- نظام حماية صارم: فحص آيدي اللاعب والتحقق من صلاحية الدخول
 local function verifyOwner()
     local playerId = LocalPlayer.UserId
-    
-    -- تحقق مما إذا كان الآيدي موجوداً في القائمة
     if not ALLOWED_OWNERS[playerId] then
-        -- طرد اللاعب فوراً في حال عدم تطابق الآيدي
         LocalPlayer:Kick("\n[ROYAL XPE SECURITY]\nعذراً، أنت غير مرخص لك بتشغيل هذا السكربت!\nتم حمايته بواسطة الأونر.")
-        while true do end -- إيقاف أي تنفيذ إضافي
+        while true do end
     end
 end
 
--- تنفيذ الفحص فوراً عند تشغيل السكربت
 verifyOwner()
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -50,11 +46,10 @@ local UserInputService = game:GetService("UserInputService")
 local StarterGui = game:GetService("StarterGui")
 local Camera = workspace.CurrentCamera
 
--- إرسال رسالة ترحيبية عند التشغيل للأونرز فقط
 pcall(function()
     StarterGui:SetCore("SendNotification", {
         Title = "ROYAL XPE - VIP",
-        Text = "تم التحقق من هويتك بنجاح، أهلاً بك يا أونر!",
+        Text = "تم تفعيل الوزنية الذكية للأسماك القوية بنجاح!",
         Duration = 5
     })
 end)
@@ -65,7 +60,7 @@ local MAX_DISTANCE = 2500
 local RPG_ROCKET_SPEED = 220         
 local RPG_DOWN_OFFSET = 3.5          
 local RPG_AIM_SMOOTHNESS = 0.09      
-local FOV_RADIUS = 200                  
+local FOV_RADIUS = 200                   
 
 local SNIPER_BULLET_SPEED = 1200
 local SNIPER_AIM_SMOOTHNESS = 0.05
@@ -89,6 +84,7 @@ local espInventoryEnabled = true
 local UPDATE_INTERVAL = 1
 _G.RPG_Aim_Enabled = false 
 _G.Sniper_Aim_Enabled = false
+_G.AutoSkipFishing = false 
 
 local FriendStatus = {}
 local HitboxStatus = {} 
@@ -216,7 +212,7 @@ iconStroke.Thickness = 1.5
 MakeDraggable(MainIcon)
 
 local MainMenu = Instance.new("Frame", ScreenGui)
-MainMenu.Size = UDim2.new(0, 420, 0, 280)
+MainMenu.Size = UDim2.new(0, 430, 0, 350)
 MainMenu.Position = UDim2.new(0.5, 0, 0.5, 0)
 MainMenu.AnchorPoint = Vector2.new(0.5, 0.5)
 MainMenu.BackgroundColor3 = IOS_BG_COLOR
@@ -245,8 +241,8 @@ ContentFrame.BackgroundTransparency = 1
 ContentFrame.Visible = true
 
 local LeftPanel = Instance.new("Frame", ContentFrame)
-LeftPanel.Size = UDim2.new(0.46, 0, 0.88, 0)
-LeftPanel.Position = UDim2.new(0.03, 0, 0.06, 0)
+LeftPanel.Size = UDim2.new(0.46, 0, 0.68, 0)
+LeftPanel.Position = UDim2.new(0.03, 0, 0.05, 0)
 LeftPanel.BackgroundColor3 = Color3.fromRGB(32, 32, 36)
 LeftPanel.BackgroundTransparency = 0.2
 Instance.new("UICorner", LeftPanel).CornerRadius = UDim.new(0, 14)
@@ -279,7 +275,7 @@ local ESPInvToggleBtn = createIOSButton(LeftPanel, UDim2.new(0.04, 0, 0.20, 0), 
 ESPInvToggleBtn.BackgroundColor3 = IOS_ACCENT_COLOR
 
 local RPGAimBtn = createIOSButton(LeftPanel, UDim2.new(0.04, 0, 0.32, 0), "RPG Aim: OFF [F]")
-local SniperAimBtn = createIOSButton(LeftPanel, UDim2.new(0.04, 0, 0.44, 0), "Sniper Aim: OFF [Q]")
+local SniperAimBtn = createIOSButton(LeftPanel, UDim2.new(0.04, 0, 0.44, 0), "Sniper Aim: OFF")
 local ViewSelfBtn = createIOSButton(LeftPanel, UDim2.new(0.04, 0, 0.56, 0), "View Self: OFF")
 local DiscordBtn = createIOSButton(LeftPanel, UDim2.new(0.04, 0, 0.68, 0), "Copy Discord Link")
 DiscordBtn.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
@@ -337,8 +333,8 @@ DiscordBtn.MouseButton1Click:Connect(function()
 end)
 
 local RightPanel = Instance.new("Frame", ContentFrame)
-RightPanel.Size = UDim2.new(0.46, 0, 0.88, 0)
-RightPanel.Position = UDim2.new(0.51, 0, 0.06, 0)
+RightPanel.Size = UDim2.new(0.46, 0, 0.68, 0)
+RightPanel.Position = UDim2.new(0.51, 0, 0.05, 0)
 RightPanel.BackgroundColor3 = Color3.fromRGB(32, 32, 36)
 RightPanel.BackgroundTransparency = 0.2
 Instance.new("UICorner", RightPanel).CornerRadius = UDim.new(0, 14)
@@ -362,6 +358,31 @@ local NearbyLayout = Instance.new("UIListLayout", NearbyScroll)
 NearbyLayout.SortOrder = Enum.SortOrder.LayoutOrder
 NearbyLayout.Padding = UDim.new(0, 4)
 
+-- ================= أزرار التحكم بالصيد الموزون =================
+local SmartFishBtn = Instance.new("TextButton", ContentFrame)
+SmartFishBtn.Size = UDim2.new(0.94, 0, 0, 32)
+SmartFishBtn.Position = UDim2.new(0.03, 0, 0.75, 0)
+SmartFishBtn.BackgroundColor3 = Color3.fromRGB(0, 122, 255)
+SmartFishBtn.Text = "⚡ Instant Skip Fish [V] (وزنية الأسماك القوية)"
+SmartFishBtn.TextColor3 = IOS_TEXT_COLOR
+SmartFishBtn.Font = Enum.Font.GothamBold
+SmartFishBtn.TextSize = 11
+Instance.new("UICorner", SmartFishBtn).CornerRadius = UDim.new(0, 8)
+
+local AutoFishToggleBtn = Instance.new("TextButton", ContentFrame)
+AutoFishToggleBtn.Size = UDim2.new(0.94, 0, 0, 36)
+AutoFishToggleBtn.Position = UDim2.new(0.03, 0, 0.86, 0)
+AutoFishToggleBtn.BackgroundColor3 = Color3.fromRGB(48, 48, 54)
+AutoFishToggleBtn.Text = "🤖 Auto Skip Fishing: OFF (تخطي مستقر ومؤمن)"
+AutoFishToggleBtn.TextColor3 = IOS_TEXT_COLOR
+AutoFishToggleBtn.Font = Enum.Font.GothamBold
+AutoFishToggleBtn.TextSize = 11
+Instance.new("UICorner", AutoFishToggleBtn).CornerRadius = UDim.new(0, 8)
+
+local strokeAuto = Instance.new("UIStroke", AutoFishToggleBtn)
+strokeAuto.Color = Color3.fromRGB(70, 70, 80)
+strokeAuto.Thickness = 1.2
+
 local menuOpen = true
 MainIcon.MouseButton1Click:Connect(function()
     menuOpen = not menuOpen
@@ -377,7 +398,7 @@ local function toggleRPGAim()
     _G.RPG_Aim_Enabled = not _G.RPG_Aim_Enabled
     if _G.RPG_Aim_Enabled then
         _G.Sniper_Aim_Enabled = false
-        SniperAimBtn.Text = "Sniper Aim: OFF [Q]"
+        SniperAimBtn.Text = "Sniper Aim: OFF"
         SniperAimBtn.BackgroundColor3 = Color3.fromRGB(48, 48, 54)
     end
     if FOVCircle then
@@ -399,17 +420,85 @@ local function toggleSniperAim()
         FOVCircle.Visible = _G.RPG_Aim_Enabled or _G.Sniper_Aim_Enabled
         FOVCircle.Radius = SNIPER_FOV
     end
-    SniperAimBtn.Text = _G.Sniper_Aim_Enabled and "Sniper Aim: ON [Q]" or "Sniper Aim: OFF [Q]"
+    SniperAimBtn.Text = _G.Sniper_Aim_Enabled and "Sniper Aim: ON" or "Sniper Aim: OFF"
     SniperAimBtn.BackgroundColor3 = _G.Sniper_Aim_Enabled and IOS_SUCCESS_COLOR or Color3.fromRGB(48, 48, 54)
 end
 
 RPGAimBtn.MouseButton1Click:Connect(toggleRPGAim)
 SniperAimBtn.MouseButton1Click:Connect(toggleSniperAim)
 
+-- ================= وزنية الصيد المطورة للأسماك القوية والتكرار =================
+local success, SliderMinigame = pcall(function()
+    return require(ReplicatedStorage.Modules.Game.Minigames.SliderMinigame)
+end)
+
+local isFishingProcess = false
+local function completeMinigameOnce()
+    if isFishingProcess then return end
+    isFishingProcess = true
+    pcall(function()
+        if success and SliderMinigame and SliderMinigame.enabled and SliderMinigame.enabled.get() then
+            -- توسيع النطاق الأخضر برمجياً لتسهيل الالتقاط
+            if SliderMinigame.target_size and SliderMinigame.target_size.set then
+                pcall(function() SliderMinigame.target_size.set(0.65) end)
+            end
+
+            while SliderMinigame.enabled and SliderMinigame.enabled.get() do
+                local targetPos = SliderMinigame.target_pos and SliderMinigame.target_pos.get()
+                if targetPos then
+                    -- محاذاة السهم بدقة كاملة وبدون قفزات مفاجئة
+                    SliderMinigame.needle_pos.set(targetPos)
+                    
+                    -- تأخير متوازن ومحسوب (0.12 ثانية) يمنع اللعبة من الانهيار بعد الصيدة الخامسة
+                    task.wait(0.12)
+                    
+                    local currentLevel = SliderMinigame.level and SliderMinigame.level.get()
+                    if currentLevel then
+                        SliderMinigame.level.set(currentLevel + 1)
+                    end
+                end
+                task.wait(0.08)
+            end
+        end
+    end)
+    isFishingProcess = false
+end
+
+SmartFishBtn.MouseButton1Click:Connect(completeMinigameOnce)
+
+AutoFishToggleBtn.MouseButton1Click:Connect(function()
+    _G.AutoSkipFishing = not _G.AutoSkipFishing
+    if _G.AutoSkipFishing then
+        AutoFishToggleBtn.Text = "🤖 Auto Skip Fishing: ON (شغال تلقائياً وبثبات)"
+        AutoFishToggleBtn.BackgroundColor3 = IOS_SUCCESS_COLOR
+        strokeAuto.Color = IOS_SUCCESS_COLOR
+    else
+        AutoFishToggleBtn.Text = "🤖 Auto Skip Fishing: OFF (تخطي مستقر ومؤمن)"
+        AutoFishToggleBtn.BackgroundColor3 = Color3.fromRGB(48, 48, 54)
+        strokeAuto.Color = Color3.fromRGB(70, 70, 80)
+    end
+end)
+
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
     if gameProcessed then return end
-    if input.KeyCode == Enum.KeyCode.F then toggleRPGAim()
-    elseif input.KeyCode == Enum.KeyCode.Q then toggleSniperAim() end
+    if input.KeyCode == Enum.KeyCode.F then 
+        toggleRPGAim()
+    elseif input.KeyCode == Enum.KeyCode.V then 
+        completeMinigameOnce()
+    end
+end)
+
+-- حلقة التخطي التلقائي المضمونة والموزونة
+task.spawn(function()
+    while task.wait(0.2) do
+        if _G.AutoSkipFishing and success and SliderMinigame then
+            pcall(function()
+                if SliderMinigame.enabled and SliderMinigame.enabled.get() then
+                    completeMinigameOnce()
+                end
+            end)
+        end
+    end
 end)
 
 -- ================= الهيدبوكس الشامل =================
@@ -446,7 +535,7 @@ local function updatePlayerHitbox(p)
     end
 end
 
--- ================= الكشف المحدث (مع صورة الحساب ومنع الأصفار) =================
+-- ================= نظام الكشف المحدث (ESP) =================
 local function removeESP(char)
     if char then
         local head = char:FindFirstChild("Head")
@@ -743,7 +832,7 @@ task.spawn(function()
     while task.wait(1) do updatePlayerListUI() end
 end)
 
--- ================= تشغيل الأيم بوت (RPG + Sniper) =================
+-- ================= تشغيل الأيم بوت (RPG فقط) =================
 RunService.RenderStepped:Connect(function()
     if FOVCircle then
         pcall(function()
@@ -784,42 +873,5 @@ RunService.RenderStepped:Connect(function()
             local predictedPos = targetPos + (velocity * travelTime * dynamicMultiplier)
             Camera.CFrame = Camera.CFrame:Lerp(CFrame.new(Camera.CFrame.Position, predictedPos), RPG_AIM_SMOOTHNESS)
         end
-        
-    elseif _G.Sniper_Aim_Enabled then
-        local closestTarget = nil
-        local shortestDistance = SNIPER_FOV
-
-        for _, p in ipairs(Players:GetPlayers()) do
-            if p ~= LocalPlayer and p.Character then
-                local humanoid = p.Character:FindFirstChildOfClass("Humanoid")
-                local head = p.Character:FindFirstChild("Head")
-                
-                if humanoid and humanoid.Health > 0 and head then
-                    local screenPos, onScreen = Camera:WorldToViewportPoint(head.Position)
-                    if onScreen then
-                        local screenCenter = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
-                        local distance = (Vector2.new(screenPos.X, screenPos.Y) - screenCenter).Magnitude
-                        if distance < shortestDistance then
-                            shortestDistance = distance
-                            closestTarget = head
-                        end
-                    end
-                end
-            end
-        end
-        
-        if closestTarget then
-            local targetPos = closestTarget.Position
-            local velocity = closestTarget.AssemblyLinearVelocity or Vector3.new(0, 0, 0)
-            local distance = (Camera.CFrame.Position - targetPos).Magnitude
-            local travelTime = distance / SNIPER_BULLET_SPEED
-            local predictedPos = targetPos + (velocity * travelTime * 1.1)
-            Camera.CFrame = Camera.CFrame:Lerp(CFrame.new(Camera.CFrame.Position, predictedPos), SNIPER_AIM_SMOOTHNESS)
-        end
     end
 end)
-
-for _, p in ipairs(Players:GetPlayers()) do
-    if p ~= LocalPlayer and p.Character then applyESP(p.Character) end
-end
-updatePlayerListUI()
