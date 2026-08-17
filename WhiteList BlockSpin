@@ -1,115 +1,56 @@
--- [[ ROYAL XPE - ULTIMATE OWNER VIP EDITION (WITH SMART FISHING SYSTEM) ]] --
+-- [[ ROYAL XPE - ULTIMATE OWNER VIP EDITION (IPHONE UI + DUAL AIMBOT + SELF-VIEW + DISCORD + AVATAR ESP) ]] --
 
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
+
+-- ================= قائمة الأونرز المسموح لهم (بالآيدي - UserIds) =================
+local ALLOWED_OWNERS = {
+    [10787902171] = true, -- استبدل الأرقام بأيدي الأونرز الحقيقيين
+    [9840589357] = true,
+    [11223344] = true,
+    [44332211] = true,
+    [55667788] = true,
+    [99887766] = true,
+    [12121212] = true,
+    [34343434] = true,
+    [56565656] = true,
+    [78787878] = true,
+    [13579246] = true,
+    [24681359] = true,
+    [11228899] = true,
+    [33445566] = true,
+    [77889900] = true,
+    [99001122] = true,
+    [44556677] = true,
+    [88990011] = true,
+    [22334455] = true,
+    [66778899] = true,
+}
+
+-- نظام حماية صارم: فحص آيدي اللاعب والتحقق من صلاحية الدخول
+local function verifyOwner()
+    local playerId = LocalPlayer.UserId
+    
+    -- تحقق مما إذا كان الآيدي موجوداً في القائمة
+    if not ALLOWED_OWNERS[playerId] then
+        -- طرد اللاعب فوراً في حال عدم تطابق الآيدي
+        LocalPlayer:Kick("\n[ROYAL XPE SECURITY]\nعذراً، أنت غير مرخص لك بتشغيل هذا السكربت!\nتم حمايته بواسطة الأونر.")
+        while true do end -- إيقاف أي تنفيذ إضافي
+    end
+end
+
+-- تنفيذ الفحص فوراً عند تشغيل السكربت
+verifyOwner()
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local StarterPack = game:GetService("StarterPack")
 local RunService = game:GetService("RunService")
 local CoreGui = game:GetService("CoreGui")
 local UserInputService = game:GetService("UserInputService")
 local StarterGui = game:GetService("StarterGui")
-local TweenService = game:GetService("TweenService")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local VirtualInputManager = game:GetService("VirtualInputManager")
-local StarterPack = game:GetService("StarterPack")
 local Camera = workspace.CurrentCamera
 
---------------------------------------------------------------------------------
--- [1] نظام الحماية المطور والمشدد (25 أيدي بالأسماء + حظر مؤقت 3 ساعات)
---------------------------------------------------------------------------------
-local ALLOWED_USERS = {
-    {id = 10787902171, name = "المالك"},             -- 1
-    {id = 123456782, name = "Feysnimra4485"},       -- 2
-    {id = 123456783, name = "larezbears007"},       -- 3
-    {id = 123456784, name = "صديق"},                -- 4
-    {id = 000000000, name = "مشترك"},              -- 5
-    {id = 123456786, name = "عضو 6"},               -- 6
-    {id = 123456787, name = "عضو 7"},               -- 7
-    {id = 123456788, name = "عضو 8"},               -- 8
-    {id = 123456789, name = "عضو 9"},               -- 9
-    {id = 123456790, name = "عضو 10"},              -- 10
-    {id = 123456791, name = "عضو 11"},              -- 11
-    {id = 123456792, name = "عضو 12"},              -- 12
-    {id = 123456793, name = "عضو 13"},              -- 13
-    {id = 123456794, name = "عضو 14"},              -- 14
-    {id = 000000000, name = "تجريب"},              -- 15
-    {id = 123456796, name = "عضو 16"},              -- 16
-    {id = 123456797, name = "عضو 17"},              -- 17
-    {id = 123456798, name = "عضو 18"},              -- 18
-    {id = 123456799, name = "عضو 19"},              -- 19
-    {id = 123456800, name = "عضو 20"},              -- 20
-    {id = 123456801, name = "عضو 21"},              -- 21
-    {id = 123456802, name = "عضو 22"},              -- 22
-    {id = 123456803, name = "عضو 23"},              -- 23
-    {id = 123456804, name = "عضو 24"},              -- 24
-    {id = 123456805, name = "عضو 25"},              -- 25
-}
-
-local MAX_ATTEMPTS = 3
-local BAN_DURATION = 10800
-local attemptsKey = "ScriptAttemptCount_" .. LocalPlayer.UserId
-
-local function verifyOwner()
-    local isAllowed = false
-    local userName = "غير معروف"
-
-    for _, user in ipairs(ALLOWED_USERS) do
-        if LocalPlayer.UserId == user.id then
-            isAllowed = true
-            userName = user.name
-            break
-        end
-    end
-
-    if not isAllowed then
-        local currentAttempts = (getgenv()[attemptsKey] or 0) + 1
-        getgenv()[attemptsKey] = currentAttempts
-
-        if currentAttempts >= MAX_ATTEMPTS then
-            LocalPlayer:Kick("\n[ROYAL XPE SECURITY]\nتم حظرك مؤقتاً لمدة 3 ساعات لتكرار إدخال آيدي خاطئ!")
-            while true do end
-        else
-            LocalPlayer:Kick("\n[ROYAL XPE SECURITY]\nعذراً، الآيدي غير مصرح له! المحاولة ("..currentAttempts.."/"..MAX_ATTEMPTS..") - سيتم الطرد والمنع لمدة 3 ساعات عند الاكتمال.")
-            while true do end
-        end
-    else
-        print("أهلاً بك يا " .. userName .. "، تم التحقق من هويتك بنجاح.")
-    end
-end
-
-verifyOwner()
-
--- إرسال رسالة التحديث الترحيبية الاحترافية عند التشغيل
-local function showUpdateNotification()
-    local tempGui = Instance.new("ScreenGui", CoreGui)
-    tempGui.Name = "UpdateNotifGui"
-    tempGui.ResetOnSpawn = false
-
-    local notif = Instance.new("TextLabel")
-    notif.Size = UDim2.new(0, 320, 0, 50)
-    notif.Position = UDim2.new(0.5, -160, 0.1, -60)
-    notif.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
-    notif.TextColor3 = Color3.fromRGB(0, 255, 150)
-    notif.TextSize = 15
-    notif.Font = Enum.Font.GothamBold
-    notif.Text = "✨ تم تحديث السكربت بنجاح! استمتع بالحدث ✨"
-    notif.Parent = tempGui
-
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 10)
-    corner.Parent = notif
-
-    local stroke = Instance.new("UIStroke", notif)
-    stroke.Color = Color3.fromRGB(0, 170, 255)
-    stroke.Thickness = 1.5
-
-    TweenService:Create(notif, TweenInfo.new(0.5, Enum.EasingStyle.Back), {Position = UDim2.new(0.5, -160, 0.1, 0)}):Play()
-    task.delay(4, function()
-        TweenService:Create(notif, TweenInfo.new(0.5, Enum.EasingStyle.Quad), {Position = UDim2.new(0.5, -160, 0.1, -60)}):Play()
-        task.wait(0.5)
-        tempGui:Destroy()
-    end)
-end
-showUpdateNotification()
-
+-- إرسال رسالة ترحيبية عند التشغيل للأونرز فقط
 pcall(function()
     StarterGui:SetCore("SendNotification", {
         Title = "ROYAL XPE - VIP",
@@ -121,10 +62,10 @@ end)
 -- ================= الإعدادات والوزنيات =================
 local MAX_DISTANCE = 2500 
 
-local RPG_ROCKET_SPEED = 220             
-local RPG_DOWN_OFFSET = 3.5              
-local RPG_AIM_SMOOTHNESS = 0.09     
-local FOV_RADIUS = 200                     
+local RPG_ROCKET_SPEED = 220         
+local RPG_DOWN_OFFSET = 3.5          
+local RPG_AIM_SMOOTHNESS = 0.09      
+local FOV_RADIUS = 200                  
 
 local SNIPER_BULLET_SPEED = 1200
 local SNIPER_AIM_SMOOTHNESS = 0.05
@@ -140,7 +81,7 @@ local IOS_ACCENT_COLOR = Color3.fromRGB(0, 122, 255)
 local IOS_SUCCESS_COLOR = Color3.fromRGB(52, 199, 89)
 local IOS_TEXT_COLOR = Color3.fromRGB(255, 255, 255)
 local VISUAL_COLOR = Color3.fromRGB(0, 255, 100) 
-local FRIEND_COLOR = Color3.fromRGB(0, 255, 0)       
+local FRIEND_COLOR = Color3.fromRGB(0, 255, 0)      
 local HITBOX_COLOR = Color3.fromRGB(255, 50, 50)    
 
 _G.ESP_Enabled = true
@@ -166,9 +107,6 @@ local RARITY_COLORS = {
 pcall(function()
     if CoreGui:FindFirstChild("XPE_Premium_Hub") then
         CoreGui["XPE_Premium_Hub"]:Destroy()
-    end
-    if CoreGui:FindFirstChild("BloxlSpinSmartSkip") then
-        CoreGui["BloxlSpinSmartSkip"]:Destroy()
     end
 end)
 
@@ -260,7 +198,7 @@ local function getRealName(t)
     return fallbackName
 end
 
--- ================= الواجهة الرئيسية (ROYAL XPE) =================
+-- ================= الواجهة الرئيسية =================
 local ScreenGui = Instance.new("ScreenGui", CoreGui)
 ScreenGui.Name = "XPE_Premium_Hub"
 ScreenGui.ResetOnSpawn = false
@@ -342,10 +280,7 @@ ESPInvToggleBtn.BackgroundColor3 = IOS_ACCENT_COLOR
 
 local RPGAimBtn = createIOSButton(LeftPanel, UDim2.new(0.04, 0, 0.32, 0), "RPG Aim: OFF [F]")
 local SniperAimBtn = createIOSButton(LeftPanel, UDim2.new(0.04, 0, 0.44, 0), "Sniper Aim: OFF [Q]")
-
--- زر "تفعيل صيد" المطلوب إضافته
-local FishMasterBtn = createIOSButton(LeftPanel, UDim2.new(0.04, 0, 0.56, 0), "تفعيل صيد: OFF")
-
+local ViewSelfBtn = createIOSButton(LeftPanel, UDim2.new(0.04, 0, 0.56, 0), "View Self: OFF")
 local DiscordBtn = createIOSButton(LeftPanel, UDim2.new(0.04, 0, 0.68, 0), "Copy Discord Link")
 DiscordBtn.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
 
@@ -386,6 +321,12 @@ end)
 SizePlus.MouseButton1Click:Connect(function()
     _G.TorsoSizeMultiplier = math.clamp(_G.TorsoSizeMultiplier + 0.5, 1, 10)
     SizeLabel.Text = "Torso Size: " .. string.format("%.1f", _G.TorsoSizeMultiplier)
+end)
+
+ViewSelfBtn.MouseButton1Click:Connect(function()
+    _G.ViewSelf = not _G.ViewSelf
+    ViewSelfBtn.Text = _G.ViewSelf and "View Self: ON" or "View Self: OFF"
+    ViewSelfBtn.BackgroundColor3 = _G.ViewSelf and IOS_SUCCESS_COLOR or Color3.fromRGB(48, 48, 54)
 end)
 
 DiscordBtn.MouseButton1Click:Connect(function()
@@ -432,178 +373,6 @@ CloseBtn.MouseButton1Click:Connect(function()
     menuOpen = false
 end)
 
--- ================= نظام الصيد والسكب الذكي المدمج =================
-local _G_FishingActive = false
-local FishGui = nil
-
-local FishSettings = {
-    ["coelacanth"] = true,
-    ["dolphinfish"] = true,
-    ["marlin"] = true,
-    ["sailfish"] = true,
-    ["tuna"] = true,
-    ["bass"] = false,
-    ["salmon"] = false,
-    ["perch"] = false
-}
-
-local function buildFishGUI()
-    if CoreGui:FindFirstChild("BloxlSpinSmartSkip") then
-        CoreGui.BloxlSpinSmartSkip:Destroy()
-    end
-
-    local FScreenGui = Instance.new("ScreenGui")
-    FScreenGui.Name = "BloxlSpinSmartSkip"
-    FScreenGui.Parent = CoreGui
-
-    local Frame = Instance.new("Frame")
-    Frame.Size = UDim2.new(0, 260, 0, 340)
-    Frame.Position = UDim2.new(0.75, 0, 0.2, 0)
-    Frame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-    Frame.BorderSizePixel = 0
-    Frame.Active = true
-    Frame.Draggable = true
-    Frame.Parent = FScreenGui
-
-    local UICorner = Instance.new("UICorner")
-    UICorner.CornerRadius = UDim.new(0, 10)
-    UICorner.Parent = Frame
-
-    local Title = Instance.new("TextLabel")
-    Title.Size = UDim2.new(1, 0, 0, 35)
-    Title.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-    Title.TextColor3 = Color3.fromRGB(0, 255, 128)
-    Title.TextSize, Title.Font = 13, Enum.Font.SourceSansBold
-    Title.Text = "Bloxl Spin - Smart Skip Manager"
-    Title.Parent = Frame
-
-    local TitleCorner = Instance.new("UICorner")
-    TitleCorner.CornerRadius = UDim.new(0, 10)
-    TitleCorner.Parent = Title
-
-    local ScrollingFrame = Instance.new("ScrollingFrame")
-    ScrollingFrame.Size = UDim2.new(1, -10, 1, -45)
-    ScrollingFrame.Position = UDim2.new(0, 5, 0, 40)
-    ScrollingFrame.BackgroundTransparency = 1
-    ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 320)
-    ScrollingFrame.ScrollBarThickness = 6
-    ScrollingFrame.Parent = Frame
-
-    local UIListLayout = Instance.new("UIListLayout")
-    UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    UIListLayout.Padding = UDim.new(0, 6)
-    UIListLayout.Parent = ScrollingFrame
-
-    local function createFishToggle(fishName, defaultState)
-        local btn = Instance.new("TextButton")
-        btn.Size = UDim2.new(1, -10, 0, 32)
-        btn.BackgroundColor3 = defaultState and Color3.fromRGB(0, 100, 50) or Color3.fromRGB(100, 25, 25)
-        btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-        btn.TextSize, btn.Font = 12, Enum.Font.SourceSansBold
-        
-        if defaultState then
-            btn.Text = fishName:upper() .. " : ON [صيد]"
-        else
-            btn.Text = fishName:upper() .. " : OFF [سكب]"
-        end
-        
-        btn.Parent = ScrollingFrame
-        
-        local corner = Instance.new("UICorner")
-        corner.CornerRadius = UDim.new(0, 6)
-        corner.Parent = btn
-        
-        btn.MouseButton1Click:Connect(function()
-            FishSettings[fishName] = not FishSettings[fishName]
-            local state = FishSettings[fishName]
-            
-            if state then
-                btn.BackgroundColor3 = Color3.fromRGB(0, 100, 50)
-                btn.Text = fishName:upper() .. " : ON [صيد]"
-            else
-                btn.BackgroundColor3 = Color3.fromRGB(100, 25, 25)
-                btn.Text = fishName:upper() .. " : OFF [سكب]"
-            end
-        end)
-    end
-
-    for fishName, state in pairs(FishSettings) do
-        createFishToggle(fishName, state)
-    end
-
-    FishGui = FScreenGui
-end
-
-local function pressKeyTwo()
-    pcall(function()
-        VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Two, false, game)
-        task.wait(0.05)
-        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Two, false, game)
-    end)
-end
-
--- تشغيل لูป الصيد والسكب في الخلفية
-task.spawn(function()
-    local success, SliderMinigame = pcall(function()
-        return require(ReplicatedStorage.Modules.Game.Minigames.SliderMinigame)
-    end)
-
-    while task.wait(0.1) do
-        if _G_FishingActive and success and SliderMinigame then
-            pcall(function()
-                if SliderMinigame.enabled and SliderMinigame.enabled.get() then
-                    local shouldSkip = false
-                    local playerGui = LocalPlayer:FindFirstChild("PlayerGui")
-                    if playerGui then
-                        for _, gui in ipairs(playerGui:GetDescendants()) do
-                            if gui:IsA("TextLabel") and (gui.Text:lower():find("bass") or gui.Text:lower():find("salmon") or gui.Text:lower():find("perch")) then
-                                local txt = gui.Text:lower()
-                                for fishName, isAllowed in pairs(FishSettings) do
-                                    if txt:find(fishName) and not isAllowed then
-                                        shouldSkip = true
-                                        break
-                                    end
-                                end
-                            end
-                        end
-                    end
-                    
-                    if shouldSkip then
-                        pressKeyTwo()
-                        task.wait(0.2)
-                        pressKeyTwo()
-                    else
-                        task.wait(0.15)
-                        if SliderMinigame.enabled and SliderMinigame.enabled.get() then
-                            local targetPos = SliderMinigame.target_pos.get()
-                            SliderMinigame.needle_pos.set(targetPos)
-                            task.wait(0.05)
-                            local currentLevel = SliderMinigame.level.get()
-                            SliderMinigame.level.set(currentLevel + 1)
-                        end
-                    end
-                end
-            end)
-        end
-    end
-end)
-
-FishMasterBtn.MouseButton1Click:Connect(function()
-    _G_FishingActive = not _G_FishingActive
-    if _G_FishingActive then
-        FishMasterBtn.Text = "تفعيل صيد: ON"
-        FishMasterBtn.BackgroundColor3 = IOS_SUCCESS_COLOR
-        buildFishGUI()
-    else
-        FishMasterBtn.Text = "تفعيل صيد: OFF"
-        FishMasterBtn.BackgroundColor3 = Color3.fromRGB(48, 48, 54)
-        if CoreGui:FindFirstChild("BloxlSpinSmartSkip") then
-            CoreGui.BloxlSpinSmartSkip:Destroy()
-        end
-    end
-end)
-
--- ================= تفعيل الـ Aimbot والـ ESP الأساسي =================
 local function toggleRPGAim()
     _G.RPG_Aim_Enabled = not _G.RPG_Aim_Enabled
     if _G.RPG_Aim_Enabled then
@@ -643,4 +412,414 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
     elseif input.KeyCode == Enum.KeyCode.Q then toggleSniperAim() end
 end)
 
-print("تم دمج سكربت الصيد الذكي داخل واجهة Royal XPE بنجاح!")
+-- ================= الهيدبوكس الشامل =================
+local function updatePlayerHitbox(p)
+    if not p.Character then return end
+    local leftLegs, rightLegs, torsos = {}, {}, {}
+    for _, part in ipairs(p.Character:GetChildren()) do
+        if part:IsA("BasePart") then
+            local name = part.Name:lower()
+            if name:find("left") and (name:find("leg") or name:find("foot") or name:find("shin")) then
+                table.insert(leftLegs, part)
+            elseif name:find("right") and (name:find("leg") or name:find("foot") or name:find("shin")) then
+                table.insert(rightLegs, part)
+            elseif name:find("torso") or name:find("upper") or name:find("lower") or name == "torso" then
+                table.insert(torsos, part)
+            end
+        end
+    end
+    
+    if HitboxStatus[p.Name] then
+        for _, leg in ipairs(leftLegs) do leg.Size = Vector3.new(1, 2, 1) leg.Transparency = 0 leg.CanCollide = true end
+        for _, leg in ipairs(rightLegs) do leg.Size = Vector3.new(1, 2, 1) leg.Transparency = 0 leg.CanCollide = true end
+        for _, torso in ipairs(torsos) do
+            local tSz = _G.TorsoSizeMultiplier
+            torso.Size = Vector3.new(tSz, tSz, tSz)
+            torso.Transparency = 0.55
+            torso.Color = HITBOX_COLOR
+            torso.CanCollide = false
+        end
+    else
+        for _, leg in ipairs(leftLegs) do leg.Size = Vector3.new(1, 2, 1) leg.Transparency = 0 leg.Color = Color3.fromRGB(100, 100, 100) leg.CanCollide = true end
+        for _, leg in ipairs(rightLegs) do leg.Size = Vector3.new(1, 2, 1) leg.Transparency = 0 leg.Color = Color3.fromRGB(100, 100, 100) leg.CanCollide = true end
+        for _, torso in ipairs(torsos) do torso.Size = Vector3.new(2, 1, 1) torso.Transparency = 0 torso.Color = Color3.fromRGB(124, 92, 70) torso.CanCollide = true end
+    end
+end
+
+-- ================= الكشف المحدث (مع صورة الحساب ومنع الأصفار) =================
+local function removeESP(char)
+    if char then
+        local head = char:FindFirstChild("Head")
+        if head then 
+            local b = head:FindFirstChild("AnouarNameHP") 
+            if b then b:Destroy() end 
+        end
+        local h = char:FindFirstChild("AnouarHighlight") 
+        if h then h:Destroy() end
+        local p = Players:GetPlayerFromCharacter(char)
+        if p and BillboardCache[p] then
+            BillboardCache[p]:Destroy()
+            BillboardCache[p] = nil
+        end
+    end
+end
+
+local function updateESP(p)
+    local bb = BillboardCache[p]
+    if not bb then return end
+    local char = p.Character
+    if not char or not char:FindFirstChild("HumanoidRootPart") then 
+        bb.Enabled = false
+        return 
+    end
+    
+    local container = bb:FindFirstChild("EspContainer")
+    if not container then return end
+    container:ClearAllChildren()
+
+    local layout = Instance.new("UIListLayout", container)
+    layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+    layout.VerticalAlignment = Enum.VerticalAlignment.Bottom 
+    layout.Padding = UDim.new(0, 2)
+
+    local tools = {}
+    if p:FindFirstChild("Backpack") then
+        for _, t in ipairs(p.Backpack:GetChildren()) do
+            if t:IsA("Tool") and t.Name:lower() ~= "fists" then table.insert(tools, t) end
+        end
+    end
+    if char then
+        for _, t in ipairs(char:GetChildren()) do
+            if t:IsA("Tool") and t.Name:lower() ~= "fists" then table.insert(tools, t) end
+        end
+    end
+
+    bb.Enabled = _G.ESP_Enabled and espInventoryEnabled and (#tools > 0)
+    
+    for _, tool in ipairs(tools) do
+        local name = getRealName(tool)
+        if name then
+            local lbl = Instance.new("TextLabel", container)
+            lbl.Size = UDim2.new(0, 180, 0, 14)
+            lbl.BackgroundTransparency = 1
+            lbl.Text = name
+            lbl.Font = Enum.Font.GothamBold
+            lbl.TextSize = 13
+            lbl.TextStrokeTransparency = 0.5
+            local rarity = tool:GetAttribute("RarityName") or tool:GetAttribute("Rarity")
+            lbl.TextColor3 = RARITY_COLORS[rarity] or Color3.fromRGB(255,255,255)
+            lbl.TextXAlignment = Enum.TextXAlignment.Center
+        end
+    end
+end
+
+local function applyESP(char)
+    local plr = Players:GetPlayerFromCharacter(char)
+    if not plr or plr == LocalPlayer then return end
+    removeESP(char)
+
+    local head = char:FindFirstChild("Head")
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    if not head or not hum then return end
+    if not _G.ESP_Enabled then return end
+
+    local isFriend = (FriendStatus[plr.Name] == true)
+    local activeColor = isFriend and FRIEND_COLOR or VISUAL_COLOR
+    local activeOutline = isFriend and FRIEND_COLOR or IOS_ACCENT_COLOR
+
+    local bill = Instance.new("BillboardGui", head)
+    bill.Name = "AnouarNameHP"
+    bill.Adornee = head
+    bill.Size = UDim2.new(0, 160, 0, 85)
+    bill.StudsOffset = Vector3.new(0, 3.8, 0)
+    bill.AlwaysOnTop = true
+
+    local avatarImg = Instance.new("ImageLabel", bill)
+    avatarImg.Size = UDim2.new(0, 36, 0, 36)
+    avatarImg.Position = UDim2.new(0.5, -18, 0, 0)
+    avatarImg.BackgroundTransparency = 1
+    avatarImg.Image = "rbxthumb://type=AvatarHeadShot&id=" .. plr.UserId .. "&w=48&h=48"
+    Instance.new("UICorner", avatarImg).CornerRadius = UDim.new(1, 0)
+
+    local name = Instance.new("TextLabel", bill)
+    name.Size = UDim2.new(1, 0, 0, 16)
+    name.Position = UDim2.new(0, 0, 0, 38)
+    name.BackgroundTransparency = 1
+    name.Text = plr.Name
+    name.TextColor3 = Color3.new(1, 1, 1)
+    name.TextStrokeTransparency = 0
+    name.Font = Enum.Font.SourceSansBold
+    name.TextSize = 13
+
+    local hpBg = Instance.new("Frame", bill)
+    hpBg.Size = UDim2.new(1, -6, 0, 5)
+    hpBg.Position = UDim2.new(0, 3, 0, 56)
+    hpBg.BackgroundColor3 = Color3.new(0, 0, 0)
+    Instance.new("UICorner", hpBg).CornerRadius = UDim.new(0, 3)
+
+    local hpFill = Instance.new("Frame", hpBg)
+    hpFill.Size = UDim2.new(1, 0, 1, 0)
+    hpFill.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+    Instance.new("UICorner", hpFill).CornerRadius = UDim.new(0, 3)
+
+    local hpText = Instance.new("TextLabel", hpBg)
+    hpText.Size = UDim2.new(1, 0, 1, 0)
+    hpText.BackgroundTransparency = 1
+    hpText.TextColor3 = Color3.new(1, 1, 1)
+    hpText.TextStrokeTransparency = 0
+    hpText.TextSize = 8
+
+    local function updateHP()
+        pcall(function()
+            if hum and hum.Parent and hum.MaxHealth > 0 then
+                local health = math.floor(hum.Health)
+                local maxHealth = math.floor(hum.MaxHealth)
+                
+                if health <= 0 then
+                    bill.Enabled = false
+                else
+                    bill.Enabled = true
+                    local r = math.clamp(health / maxHealth, 0, 1)
+                    hpFill.Size = UDim2.new(r, 0, 1, 0)
+                    hpText.Text = health .. "/" .. maxHealth
+                end
+            end
+        end)
+    end
+
+    hum.HealthChanged:Connect(updateHP)
+    hum.Died:Connect(function() removeESP(char) end)
+    updateHP()
+
+    local hl = Instance.new("Highlight", char)
+    hl.Name = "AnouarHighlight"
+    hl.OutlineColor = activeOutline
+    hl.OutlineTransparency = 0
+    hl.FillColor = activeColor
+    hl.FillTransparency = isFriend and 0.65 or 1
+
+    local root = char:WaitForChild("HumanoidRootPart", 10)
+    if root then
+        if BillboardCache[plr] then BillboardCache[plr]:Destroy() end
+
+        local bb = Instance.new("BillboardGui", root)
+        bb.Name = "FixedUnderfootESP"
+        bb.Size = UDim2.new(0, 200, 0, 150)
+        bb.StudsOffset = Vector3.new(0, -3.5, 0) 
+        bb.AlwaysOnTop = true
+        bb.MaxDistance = MAX_DISTANCE
+        
+        local cont = Instance.new("Frame", bb)
+        cont.Name = "EspContainer"
+        cont.Size = UDim2.new(1, 0, 1, 0)
+        cont.BackgroundTransparency = 1
+        
+        BillboardCache[plr] = bb
+        updateESP(plr)
+
+        task.spawn(function()
+            while char.Parent and bb.Parent do
+                updateESP(plr)
+                task.wait(UPDATE_INTERVAL)
+            end
+        end)
+    end
+end
+
+ESPToggleBtn.MouseButton1Click:Connect(function()
+    _G.ESP_Enabled = not _G.ESP_Enabled
+    if _G.ESP_Enabled then
+        ESPToggleBtn.Text = "ESP: ON"
+        ESPToggleBtn.BackgroundColor3 = IOS_ACCENT_COLOR
+        for _, p in ipairs(Players:GetPlayers()) do
+            if p ~= LocalPlayer and p.Character then applyESP(p.Character) end
+        end
+    else
+        ESPToggleBtn.Text = "ESP: OFF"
+        ESPToggleBtn.BackgroundColor3 = Color3.fromRGB(48, 48, 54)
+        for _, p in ipairs(Players:GetPlayers()) do
+            if p.Character then removeESP(p.Character) end
+        end
+    end
+end)
+
+ESPInvToggleBtn.MouseButton1Click:Connect(function()
+    espInventoryEnabled = not espInventoryEnabled
+    ESPInvToggleBtn.Text = espInventoryEnabled and "ESP Inventory: ON" or "ESP Inventory: OFF"
+    ESPInvToggleBtn.BackgroundColor3 = espInventoryEnabled and IOS_ACCENT_COLOR or Color3.fromRGB(48, 48, 54)
+    for _, p in ipairs(Players:GetPlayers()) do updateESP(p) end
+end)
+
+RunService.Heartbeat:Connect(function()
+    if _G.ESP_Enabled then
+        for _, p in ipairs(Players:GetPlayers()) do
+            if p ~= LocalPlayer and p.Character then
+                local head = p.Character:FindFirstChild("Head")
+                local hum = p.Character:FindFirstChildOfClass("Humanoid")
+                if head and hum and hum.Health > 0 then
+                    if not head:FindFirstChild("AnouarNameHP") then
+                        applyESP(p.Character)
+                    end
+                end
+            end
+        end
+    end
+
+    if _G.ViewSelf and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+        Camera.CameraSubject = LocalPlayer.Character.Humanoid
+    end
+end)
+
+-- ================= قائمة اللاعبين =================
+local function updatePlayerListUI()
+    for _, child in ipairs(NearbyScroll:GetChildren()) do
+        if child:IsA("Frame") then child:Destroy() end
+    end
+
+    local lRoot = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+    
+    for _, p in ipairs(Players:GetPlayers()) do
+        if p ~= LocalPlayer then
+            local isFriend = (FriendStatus[p.Name] == true)
+            local isHitboxOn = (HitboxStatus[p.Name] == true)
+            local pRoot = p.Character and p.Character:FindFirstChild("HumanoidRootPart")
+            local distText = ""
+            
+            if lRoot and pRoot then
+                local dist = math.floor((lRoot.Position - pRoot.Position).Magnitude)
+                distText = " (" .. dist .. "m)"
+            end
+
+            local rowFrame = Instance.new("Frame", NearbyScroll)
+            rowFrame.Size = UDim2.new(1, 0, 0, 24)
+            rowFrame.BackgroundTransparency = 1
+
+            local nameBtn = Instance.new("TextButton", rowFrame)
+            nameBtn.Size = UDim2.new(0.60, 0, 1, 0)
+            nameBtn.BackgroundTransparency = 1
+            nameBtn.Text = "• " .. p.Name .. distText
+            nameBtn.Font = Enum.Font.GothamMedium
+            nameBtn.TextSize = 9
+            nameBtn.TextXAlignment = Enum.TextXAlignment.Left
+            nameBtn.TextColor3 = isFriend and FRIEND_COLOR or Color3.fromRGB(200, 200, 205)
+
+            nameBtn.MouseButton1Click:Connect(function()
+                FriendStatus[p.Name] = not FriendStatus[p.Name]
+                if p.Character then applyESP(p.Character) end
+                updatePlayerListUI()
+            end)
+
+            local hbBtn = Instance.new("TextButton", rowFrame)
+            hbBtn.Size = UDim2.new(0.38, 0, 0.85, 0)
+            hbBtn.Position = UDim2.new(0.60, 0, 0.07, 0)
+            hbBtn.BackgroundColor3 = isHitboxOn and Color3.fromRGB(255, 69, 58) or Color3.fromRGB(48, 48, 54)
+            hbBtn.Text = isHitboxOn and "Hitbox: ON" or "Hitbox: OFF"
+            hbBtn.Font = Enum.Font.GothamBold
+            hbBtn.TextSize = 8
+            hbBtn.TextColor3 = IOS_TEXT_COLOR
+            Instance.new("UICorner", hbBtn).CornerRadius = UDim.new(0, 6)
+
+            hbBtn.MouseButton1Click:Connect(function()
+                HitboxStatus[p.Name] = not HitboxStatus[p.Name]
+                updatePlayerHitbox(p)
+                updatePlayerListUI()
+            end)
+        end
+    end
+    NearbyScroll.CanvasSize = UDim2.new(0, 0, 0, #NearbyScroll:GetChildren() * 26)
+end
+
+Players.PlayerAdded:Connect(function(p)
+    updatePlayerListUI()
+    p.CharacterAdded:Connect(function(char)
+        task.wait(0.5)
+        if _G.ESP_Enabled then applyESP(char) end
+    end)
+end)
+
+Players.PlayerRemoving:Connect(function() updatePlayerListUI() end)
+
+task.spawn(function()
+    while task.wait(1) do updatePlayerListUI() end
+end)
+
+-- ================= تشغيل الأيم بوت (RPG + Sniper) =================
+RunService.RenderStepped:Connect(function()
+    if FOVCircle then
+        pcall(function()
+            FOVCircle.Position = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+        end)
+    end
+
+    if _G.RPG_Aim_Enabled then
+        local closestTarget = nil
+        local shortestDistance = FOV_RADIUS
+
+        for _, p in ipairs(Players:GetPlayers()) do
+            if p ~= LocalPlayer and p.Character then
+                local humanoid = p.Character:FindFirstChildOfClass("Humanoid")
+                local rootPart = p.Character:FindFirstChild("HumanoidRootPart")
+                
+                if humanoid and humanoid.Health > 0 and rootPart then
+                    local screenPos, onScreen = Camera:WorldToViewportPoint(rootPart.Position)
+                    if onScreen then
+                        local screenCenter = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+                        local distance = (Vector2.new(screenPos.X, screenPos.Y) - screenCenter).Magnitude
+                        if distance < shortestDistance then
+                            shortestDistance = distance
+                            closestTarget = rootPart
+                        end
+                    end
+                end
+            end
+        end
+        
+        if closestTarget then
+            local targetPos = closestTarget.Position + Vector3.new(0, -RPG_DOWN_OFFSET, 0)
+            local velocity = closestTarget.AssemblyLinearVelocity or Vector3.new(0, 0, 0)
+            local speed = velocity.Magnitude
+            local distance = (Camera.CFrame.Position - targetPos).Magnitude
+            local travelTime = distance / RPG_ROCKET_SPEED
+            local dynamicMultiplier = speed > 30 and (1.8 + (speed / 35)) or 1.3
+            local predictedPos = targetPos + (velocity * travelTime * dynamicMultiplier)
+            Camera.CFrame = Camera.CFrame:Lerp(CFrame.new(Camera.CFrame.Position, predictedPos), RPG_AIM_SMOOTHNESS)
+        end
+        
+    elseif _G.Sniper_Aim_Enabled then
+        local closestTarget = nil
+        local shortestDistance = SNIPER_FOV
+
+        for _, p in ipairs(Players:GetPlayers()) do
+            if p ~= LocalPlayer and p.Character then
+                local humanoid = p.Character:FindFirstChildOfClass("Humanoid")
+                local head = p.Character:FindFirstChild("Head")
+                
+                if humanoid and humanoid.Health > 0 and head then
+                    local screenPos, onScreen = Camera:WorldToViewportPoint(head.Position)
+                    if onScreen then
+                        local screenCenter = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+                        local distance = (Vector2.new(screenPos.X, screenPos.Y) - screenCenter).Magnitude
+                        if distance < shortestDistance then
+                            shortestDistance = distance
+                            closestTarget = head
+                        end
+                    end
+                end
+            end
+        end
+        
+        if closestTarget then
+            local targetPos = closestTarget.Position
+            local velocity = closestTarget.AssemblyLinearVelocity or Vector3.new(0, 0, 0)
+            local distance = (Camera.CFrame.Position - targetPos).Magnitude
+            local travelTime = distance / SNIPER_BULLET_SPEED
+            local predictedPos = targetPos + (velocity * travelTime * 1.1)
+            Camera.CFrame = Camera.CFrame:Lerp(CFrame.new(Camera.CFrame.Position, predictedPos), SNIPER_AIM_SMOOTHNESS)
+        end
+    end
+end)
+
+for _, p in ipairs(Players:GetPlayers()) do
+    if p ~= LocalPlayer and p.Character then applyESP(p.Character) end
+end
+updatePlayerListUI()
