@@ -2,55 +2,114 @@
 
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
-
--- ================= قائمة الأونرز المسموح لهم (تم وضع 20 اسماً كمثال) =================
-local ALLOWED_OWNERS = {
-    ["Feysnimra4485"] = true,
-    ["larezbears007"] = true,
-    ["Jurmuitts5322"] = true,
-    ["AnouarVIP01"] = true,
-    ["RoyalKing99"] = true,
-    ["XPE_Master"] = true,
-    ["ProPlayerX1"] = true,
-    ["VipGamer2026"] = true,
-    ["GhostOwner"] = true,
-    ["ShadowSniper"] = true,
-    ["DragonBloxl"] = true,
-    ["TitanHero"] = true,
-    ["LegendXPE"] = true,
-    ["CyberPunk07"] = true,
-    ["DarkKnight"] = true,
-    ["AlphaWolf"] = true,
-    ["StormRider"] = true,
-    ["NexusPrime"] = true,
-    ["VortexGod"] = true,
-    ["ZeroCool"] = true,
-}
-
--- نظام حماية صارم: فحص اسم اللاعب والتحقق من صلاحية الدخول
-local function verifyOwner()
-    local playerName = LocalPlayer.Name
-    
-    -- تحقق مما إذا كان الاسم موجوداً في القائمة
-    if not ALLOWED_OWNERS[playerName] then
-        -- طرد اللاعب فوراً في حال عدم تطابق الاسم
-        LocalPlayer:Kick("\n[ROYAL XPE SECURITY]\nعذراً، أنت غير مرخص لك بتشغيل هذا السكربت!\nتم حمايته بواسطة الأونر.")
-        while true do end -- إيقاف أي تنفيذ إضافي
-    end
-end
-
--- تنفيذ الفحص فوراً عند تشغيل السكربت
-verifyOwner()
-
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local StarterPack = game:GetService("StarterPack")
 local RunService = game:GetService("RunService")
 local CoreGui = game:GetService("CoreGui")
 local UserInputService = game:GetService("UserInputService")
 local StarterGui = game:GetService("StarterGui")
+local TweenService = game:GetService("TweenService")
 local Camera = workspace.CurrentCamera
 
--- إرسال رسالة ترحيبية عند التشغيل للأونرز فقط
+--------------------------------------------------------------------------------
+-- [1] نظام الحماية المطور والمشدد (25 أيدي بالأسماء + حظر مؤقت 3 ساعات)
+--------------------------------------------------------------------------------
+local ALLOWED_USERS = {
+    {id = 123456781, name = "المالك"},             -- 1
+    {id = 123456782, name = "Feysnimra4485"},      -- 2
+    {id = 123456783, name = "larezbears007"},      -- 3
+    {id = 123456784, name = "صديق"},               -- 4
+    {id = 000000000, name = "مشترك"},             -- 5 (مطلوب: ضع الأيدي هنا)
+    {id = 123456786, name = "عضو 6"},              -- 6
+    {id = 123456787, name = "عضو 7"},              -- 7
+    {id = 123456788, name = "عضو 8"},              -- 8
+    {id = 123456789, name = "عضو 9"},              -- 9
+    {id = 123456790, name = "عضو 10"},             -- 10
+    {id = 123456791, name = "عضو 11"},             -- 11
+    {id = 123456792, name = "عضو 12"},             -- 12
+    {id = 123456793, name = "عضو 13"},             -- 13
+    {id = 123456794, name = "عضو 14"},             -- 14
+    {id = 000000000, name = "تجريب"},             -- 15 (مطلوب: ضع الأيدي هنا)
+    {id = 123456796, name = "عضو 16"},             -- 16
+    {id = 123456797, name = "عضو 17"},             -- 17
+    {id = 123456798, name = "عضو 18"},             -- 18
+    {id = 123456799, name = "عضو 19"},             -- 19
+    {id = 123456800, name = "عضو 20"},             -- 20
+    {id = 123456801, name = "عضو 21"},             -- 21
+    {id = 123456802, name = "عضو 22"},             -- 22
+    {id = 123456803, name = "عضو 23"},             -- 23
+    {id = 123456804, name = "عضو 24"},             -- 24
+    {id = 123456805, name = "عضو 25"},             -- 25
+}
+
+local MAX_ATTEMPTS = 3
+local BAN_DURATION = 10800 -- 3 ساعات بالثواني
+local attemptsKey = "ScriptAttemptCount_" .. LocalPlayer.UserId
+
+local function verifyOwner()
+    local isAllowed = false
+    local userName = "غير معروف"
+
+    for _, user in ipairs(ALLOWED_USERS) do
+        if LocalPlayer.UserId == user.id then
+            isAllowed = true
+            userName = user.name
+            break
+        end
+    end
+
+    if not isAllowed then
+        local currentAttempts = (getgenv()[attemptsKey] or 0) + 1
+        getgenv()[attemptsKey] = currentAttempts
+
+        if currentAttempts >= MAX_ATTEMPTS then
+            LocalPlayer:Kick("\n[ROYAL XPE SECURITY]\nتم حظرك مؤقتاً لمدة 3 ساعات لتكرار إدخال آيدي خاطئ!")
+            while true do end
+        else
+            LocalPlayer:Kick("\n[ROYAL XPE SECURITY]\nعذراً، الآيدي غير مصرح له! المحاولة ("..currentAttempts.."/"..MAX_ATTEMPTS..") - سيتم الطرد والمنع لمدة 3 ساعات عند الاكتمال.")
+            while true do end
+        end
+    else
+        print("أهلاً بك يا " .. userName .. "، تم التحقق من هويتك بنجاح.")
+    end
+end
+
+verifyOwner()
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local StarterPack = game:GetService("StarterPack")
+
+-- إرسال رسالة التحديث الترحيبية الاحترافية عند التشغيل
+local function showUpdateNotification()
+    local tempGui = Instance.new("ScreenGui", CoreGui)
+    tempGui.Name = "UpdateNotifGui"
+    tempGui.ResetOnSpawn = false
+
+    local notif = Instance.new("TextLabel")
+    notif.Size = UDim2.new(0, 320, 0, 50)
+    notif.Position = UDim2.new(0.5, -160, 0.1, -60)
+    notif.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+    notif.TextColor3 = Color3.fromRGB(0, 255, 150)
+    notif.TextSize = 15
+    notif.Font = Enum.Font.GothamBold
+    notif.Text = "✨ تم تحديث السكربت بنجاح! استمتع بالحدث ✨"
+    notif.Parent = tempGui
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 10)
+    corner.Parent = notif
+
+    local stroke = Instance.new("UIStroke", notif)
+    stroke.Color = Color3.fromRGB(0, 170, 255)
+    stroke.Thickness = 1.5
+
+    TweenService:Create(notif, TweenInfo.new(0.5, Enum.EasingStyle.Back), {Position = UDim2.new(0.5, -160, 0.1, 0)}):Play()
+    task.delay(4, function()
+        TweenService:Create(notif, TweenInfo.new(0.5, Enum.EasingStyle.Quad), {Position = UDim2.new(0.5, -160, 0.1, -60)}):Play()
+        task.wait(0.5)
+        tempGui:Destroy()
+    end)
+end
+showUpdateNotification()
+
 pcall(function()
     StarterGui:SetCore("SendNotification", {
         Title = "ROYAL XPE - VIP",
@@ -63,9 +122,9 @@ end)
 local MAX_DISTANCE = 2500 
 
 local RPG_ROCKET_SPEED = 220         
-local RPG_DOWN_OFFSET = 3.5         
+local RPG_DOWN_OFFSET = 3.5          
 local RPG_AIM_SMOOTHNESS = 0.09     
-local FOV_RADIUS = 200                  
+local FOV_RADIUS = 200                 
 
 local SNIPER_BULLET_SPEED = 1200
 local SNIPER_AIM_SMOOTHNESS = 0.05
@@ -810,7 +869,7 @@ RunService.RenderStepped:Connect(function()
         
         if closestTarget then
             local targetPos = closestTarget.Position
-            local velocity = closestTarget.AssemblyLinearVelocity or Vector3.new(0, 0, 0)
+            local velocity = closestTarget.AssemblyLinearValue or Vector3.new(0, 0, 0)
             local distance = (Camera.CFrame.Position - targetPos).Magnitude
             local travelTime = distance / SNIPER_BULLET_SPEED
             local predictedPos = targetPos + (velocity * travelTime * 1.1)
